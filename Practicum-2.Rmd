@@ -1,0 +1,150 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+### Part 1.2 Realize the Relational Schema in SQLite
+
+First, we start loading library
+```{r}
+library(XML)
+library(RSQLite)
+
+library(dplyr)
+
+library(sqldf)
+```
+
+Second, we set up the file and path.
+```{r }
+fn <- "pubmed_sample.xml"
+dbfn <- "pubmed.db"
+```
+
+Third, we make connection to dataBase and enabling foreign keys.
+```{r, include=FALSE}
+DBcon <- dbConnect(RSQLite::SQLite(), dbfn)
+dbExecute(DBcon, "PRAGMA foreign_keys = ON")
+```
+
+
+### Part 1.2 Create table
+
+Drop table Article
+```{sql connection = "DBcon"}
+drop table if exists Article;
+```
+
+Drop table Author
+```{sql connection = "DBcon"}
+drop table if exists Author;
+```
+
+Drop table Abstract
+```{sql connection = "DBcon"}
+drop table if exists Abstract;
+```
+
+Drop table History.
+```{sql connection = "DBcon"}
+drop table if exists History;
+```
+
+Drop table Journal.
+```{sql connection = "DBcon"}
+drop table if exists Journal;
+```
+
+Drop table Author.
+```{sql connection = "DBcon"}
+drop table if exists Author;
+```
+
+Drop table PubType
+```{sql connection = "DBcon"}
+drop table if exists PubType;
+```
+
+Create table Journal
+```{sql connection = "DBcon"}
+create table Journal (
+  J_Id integer PRIMARY KEY AUTOINCREMENT,
+  ISSN text,
+  Volume integer NOT NULL,
+  Issue integer NOT NULL,
+  CiteMedium text NOT NULL,
+  Title text NOT NULL,
+  ISOAbbreviation text NOT NULL,
+  Year integer,
+  Month Text
+);
+```
+
+Create table Article
+```{sql connection = "DBcon"}
+create table Article (
+  PMID integer,
+  J_Id integer,
+  ArticleTitle text NOT NULL,
+  Pagination text,
+  Language text NOT NULL,
+  ArticleDate date,
+  PubModel text NOT NULL,
+  ElocationId text Not NULL,
+  primary key (PMID),
+  foreign key (J_Id) references Journal(J_Id)
+);
+```
+
+Create table Author
+```{sql connection = "DBcon"}
+create table Author (
+  Author_Id integer PRIMARY KEY AUTOINCREMENT,
+  PMID integer
+  LastName text NOT NULL,
+  ForeName text NOT NULL,
+  Initials text NOT NULL,
+  Affiliation text,
+  foreign key (PMID) references Article(PMID)
+);
+```
+
+
+
+Create table History
+```{sql connection = "DBcon"}
+create table History (
+  History_Id integer PRIMARY KEY AUTOINCREMENT,
+  PMID integer,
+  HistoryDate date,
+  Status text NOT NULL,
+  foreign key (PMID) references Article(PMID)
+);
+```
+
+Create table PubType
+```{sql connection = "DBcon"}
+create table PubType (
+  PubType_Id integer PRIMARY KEY AUTOINCREMENT,
+  PMID integer,
+  PublicationType text NOT NULL,
+  foreign key (PMID) references Article(PMID)
+);
+```
+
+Create table Abstract
+```{sql connection = "DBcon"}
+create table Abstract (
+  Abstract_Id integer PRIMARY KEY AUTOINCREMENT,
+  Label text NOT NULL,
+  AbstractText text,
+  PMID integer NOT NULL,
+  foreign key (PMID) references Article(PMID)
+);
+```
+
+
+Closing DB connection
+```{r}
+dbDisconnect(DBcon)
+```
+
