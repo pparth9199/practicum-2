@@ -1,0 +1,94 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Drop tables
+```{sql connection = "DBcon"}
+drop table if exists articlePub;
+```
+
+```{sql connection = "DBcon"}
+drop table if exists dimTime;
+```
+
+```{sql connection = "DBcon"}
+drop table if exists dimJournalIssue;
+```
+
+```{sql connection = "DBcon"}
+drop table if exists dimJournal;
+```
+
+```{sql connection = "DBcon"}
+drop table if exists dimArticle;
+```
+
+```{sql connection = "DBcon"}
+drop table if exists dimAuthorList;
+```
+
+```{sql connection = "DBcon"}
+drop table if exists Author;
+```
+
+Create tables
+```{sql connection = "DBcon"}
+CREATE TABLE articlePub (
+  PMID INTEGER,
+  issue_id INTEGER,
+  tid INTEGER,
+  PRIMARY KEY (PMID, issue_id, tid),
+  FOREIGN KEY (PMID) REFERENCES dimArticle(PMID),
+  FOREIGN KEY (issue_id) REFERENCES dimJournalIssue(issue_id),
+  FOREIGN KEY (tid) REFERENCES dimTime(tid)
+);
+
+CREATE TABLE dimTime (
+  tid INTEGER PRIMARY KEY,
+  year INTEGER,
+  month INTEGER
+);
+
+CREATE TABLE dimJournalIssue (
+  issue_id INTEGER PRIMARY KEY,
+  medium TEXT,
+  jid INTEGER,
+  FOREIGN KEY (jid) REFERENCES ON dimJournal(jid)
+); 
+
+CREATE TABLE dimJournal (
+  jid INTEGER PRIMARY KEY,
+  ISSN TEXT,
+  title TEXT,
+  ISOabbreviation TEXT
+);
+
+CREATE TABLE dimArticle (
+  PMID INTEGER PRIMARY KEY,
+  pubModel TEXT,
+  articleTitle TEXT,
+  pgination TEXT,
+  ElocationId TEXT,
+  articleDate DATE,
+  language TEXT,
+  authorListId INTEGER,
+  FOREIGN KEY (authorListId) REFERENCES dimAuthorList(authorListId)
+);
+
+CREATE TABLE dimAuthorList (
+  authorListId INTEGER PRIMARY KEY,
+  authorId INTEGER,
+  FOREIGN KEY (authorId) REFERENCES ON author(authorId)
+);
+
+CREATE TABLE author (
+  authorId INTEGER PRIMARY KEY,
+  lastName TEXT,
+  foreName TEXT,
+  initial TEXT,
+  affiliation TEXT
+);
+
+
+```
