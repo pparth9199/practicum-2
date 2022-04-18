@@ -5,7 +5,7 @@ output: html_notebook
 
 Drop tables
 ```{sql connection = "DBcon"}
-drop table if exists articlePub;
+drop table if exists articleFact;
 ```
 
 ```{sql connection = "DBcon"}
@@ -21,10 +21,6 @@ drop table if exists dimArticle;
 ```
 
 ```{sql connection = "DBcon"}
-drop table if exists dimAuthorList;
-```
-
-```{sql connection = "DBcon"}
 drop table if exists dimAuthor;
 ```
 
@@ -32,9 +28,10 @@ Create tables
 ```{sql connection = "DBcon"}
 CREATE TABLE articlePub (
   PMID INTEGER,
+  Author_id INTEGER,
   ISSN TEXT,
   tid INTEGER AUTO_INCREMENT,
-  PRIMARY KEY (PMID, ISSN, tid),
+  PRIMARY KEY (PMID, Author_id),
   FOREIGN KEY (PMID) REFERENCES dimArticle(PMID),
   FOREIGN KEY (ISSN) REFERENCES dimJournal(ISSN),
   FOREIGN KEY (tid) REFERENCES dimTime(tid),
@@ -54,7 +51,8 @@ CREATE TABLE dimTime (
 CREATE TABLE dimJournal (
   ISSN TEXT PRIMARY KEY,
   Title TEXT,
-  ISOabbreviation TEXT
+  ISOabbreviation TEXT,
+  CitedMedium Text
 );
 ```
 
@@ -63,22 +61,12 @@ CREATE TABLE dimArticle (
   PMID INTEGER PRIMARY KEY,
   ArticleTitle TEXT,
   ArticleDate DATE,
-  Language TEXT,
-  AuthorList_id INTEGER AUTO_INCREMENT,
-  FOREIGN KEY (AuthorList_id) REFERENCES dimAuthorList(AuthorList_id)
+  Language TEXT
 );
 ```
 
 ```{sql connection = "DBcon"}
-CREATE TABLE dimAuthorList (
-  AuthorList_id INTEGER PRIMARY KEY,
-  Author_id INTEGER,
-  FOREIGN KEY (Author_id) REFERENCES ON dimAuthor(Author_id)
-);
-```
-
-```{sql connection = "DBcon"}
-CREATE TABLE author (
+CREATE TABLE dimAuthor (
   Author_id INTEGER PRIMARY KEY,
   LastName TEXT,
   ForeName TEXT,
@@ -86,58 +74,6 @@ CREATE TABLE author (
   Affiliation TEXT
 );
 ```
-
-Insert data
-```{sql connection = "DBcon"}
-INSERT INTO articlePub(PMID, ISSN)
-SELECT Article.PMID, Journal.ISSN
-FROM Article NATURAL JOIN Journal
-```
-
-```{sql connection = "DBcon"}
-INSERT INTO dimTime(tid, Year, Month)
-SELECT articlePub.tid, Journal.Year, Journal.Month
-FROM articlePub LEFT JOIN Article
-ON articlePub.PMID = Article.PMID
-LEFT JOIN Journal
-ON Article.j_id = Journal.j_id
-```
-
-```{sql connection = "DBcon"}
-INSERT INTO dimJournal(ISSN, Title, ISOabbreviation)
-SELECT DISTINCT ISSN, Title, ISOabbreviation
-FROM Journal
-```
-
-```{sql connection = "DBcon"}
-INSERT INTO dimArticle
-SELECT PMID, ArticleTitle, ArticleDate, Language
-FROM Article
-```
-
-```{sql connection = "DBcon"}
-INSERT INTO dimArticle
-SELECT PMID, ArticleTitle, ArticleDate, Language
-FROM Article
-```
-
-```{sql connection = "DBcon"}
-INSERT INTO dimAuthorList
-SELECT dimArticle.AuthorList_id, Author.Author_id
-FROM dimArticle LEFT JOIN Author
-ON dimArticle.PMID = Author.PMID
-```
-
-```{sql connection = "DBcon"}
-INSERT INTO author
-SELECT Author_id, LastName, ForeName, Initial, Affiliation
-FROM Author
-```
-
-
-
-
-
 
 
 
