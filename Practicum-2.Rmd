@@ -96,7 +96,7 @@ Create table Author
 ```{sql connection = "DBcon"}
 create table Author (
   Author_Id integer PRIMARY KEY AUTOINCREMENT,
-  PMID integer
+  PMID integer PRIMARY KEY NOT NULL,
   LastName text NOT NULL,
   ForeName text NOT NULL,
   Initials text NOT NULL,
