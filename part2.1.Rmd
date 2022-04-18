@@ -25,16 +25,13 @@ dbExecute(DBcon, "PRAGMA foreign_keys = ON")
 ```
 
 Drop tables
+
 ```{sql connection = "DBcon"}
-drop table if exists articlePub;
+drop table if exists articleFact;
 ```
 
 ```{sql connection = "DBcon"}
 drop table if exists dimTime;
-```
-
-```{sql connection = "DBcon"}
-drop table if exists dimJournalIssue;
 ```
 
 ```{sql connection = "DBcon"}
@@ -46,34 +43,29 @@ drop table if exists dimArticle;
 ```
 
 ```{sql connection = "DBcon"}
-drop table if exists dimAuthorList;
-```
-
-```{sql connection = "DBcon"}
-drop table if exists Author;
+drop table if exists dimAuthor;
 ```
 
 Create tables
+
 ```{sql connection = "DBcon"}
-CREATE TABLE articlePub (
+CREATE TABLE articleFact (
   PMID INTEGER,
+  Author_id INTEGER,
   ISSN TEXT,
   tid INTEGER AUTO_INCREMENT,
-  aggregate INTEGER,
-  PRIMARY KEY (PMID, ISSN, tid),
+  PRIMARY KEY (PMID, Author_id),
   FOREIGN KEY (PMID) REFERENCES dimArticle(PMID),
   FOREIGN KEY (ISSN) REFERENCES dimJournal(ISSN),
   FOREIGN KEY (tid) REFERENCES dimTime(tid)
 );
 ```
 
-
 ```{sql connection = "DBcon"}
 CREATE TABLE dimTime (
   tid INTEGER PRIMARY KEY,
   Year INTEGER,
-  Month TEXT,
-  Quarter TEXT
+  Month TEXT
 );
 ```
 
@@ -81,7 +73,8 @@ CREATE TABLE dimTime (
 CREATE TABLE dimJournal (
   ISSN TEXT PRIMARY KEY,
   Title TEXT,
-  ISOabbreviation TEXT
+  ISOabbreviation TEXT,
+  CitedMedium TEXT
 );
 ```
 
@@ -90,22 +83,12 @@ CREATE TABLE dimArticle (
   PMID INTEGER PRIMARY KEY,
   ArticleTitle TEXT,
   ArticleDate DATE,
-  Language TEXT,
-  AuthorList_id INTEGER AUTO_INCREMENT,
-  FOREIGN KEY (AuthorList_id) REFERENCES dimAuthorList(AuthorList_id)
+  Language TEXT
 );
 ```
 
 ```{sql connection = "DBcon"}
-CREATE TABLE dimAuthorList (
-  AuthorList_id INTEGER PRIMARY KEY,
-  Author_id INTEGER,
-  FOREIGN KEY (Author_id) REFERENCES dimAuthor(Author_id)
-);
-```
-
-```{sql connection = "DBcon"}
-CREATE TABLE author (
+CREATE TABLE dimAuthor (
   Author_id INTEGER PRIMARY KEY,
   LastName TEXT,
   ForeName TEXT,
@@ -114,22 +97,68 @@ CREATE TABLE author (
 );
 ```
 
+# Insert Data
+
+```{sql connection = "DBcon"}
+INSERT INTO articleFact(PMID, Author_id, ISSN, tid)
+SELECT Article.PMID, Author_ref.Author_id, Journal.ISSN
+FROM Author_ref LEFT JOIN Article
+ON Article.PMID == Author_ref.PMID
+LEFT JOIN Journal
+ON Article.j_id = Journal.j_id
+```
+
+```{sql connection = "DBcon"}
+INSERT INTO dimJournal(ISSN, Title, ISOabbreviation, CitedMedium)
+SELECT ISSN, Title, ISOabbreviation, CitedMedium
+FROM Journal
+```
+
+```{sql connection = "DBcon"}
+INSERT INTO dimTime(tid, Year, Month)
+SELECT articleFact.tid, Journal.Year, Journal.Month
+FROM articleFact LEFT JOIN Article
+ON articleFact.PMID = Article.PMID
+LEFT JOIN Journal
+ON Article.j_id = Journal.j_id
+```
+
+```{sql connection = "DBcon"}
+INSERT INTO dimArticle(PMID, ArticleTitle, ArticleDate, Language)
+SELECT PMID, ArticleTitle, ArticleDate, Language
+FROM Article
+```
+
+```{sql connection = "DBcon"}
+INSERT INTO dimAuthor(Author_id, LastName, ForeName, Initial, Affiliation)
+SELECT Author_id, LastName, FoerName, Initial, Affiliation
+FROM Author
+```
+
+
+
+
+
+
 # Loading Libraries
+
 ```{r warning=FALSE}
 library(XML)
 library(xslt)
 ```
 
 # Load XML data to database
+
 ## Read XML file
+
 ```{r}
 xmlPath <- "./pubmed_sample.xml"
 xmlDoc = read_xml(xmlPath)
 ```
 
 ## Load dimJournal table
+
 ```{r}
-# Extract Journal Data
 xslPath = "./journal.xsl"
 xslDoc = read_xml(xslPath,package="xslt")
 journal_raw = xml_xslt(xmlDoc,xslDoc)
@@ -137,7 +166,24 @@ journals = unique(xmlToDataFrame(XML::xmlParse(journal_raw)))
 dbWriteTable(DBcon,name = "dimJournal", value = journals, append = TRUE)
 ```
 
+## Load Author table
 
+```{r}
+xslPath = "./author.xsl"
+xslDoc = read_xml(xslPath,package="xslt")
+author_raw = xml_xslt(xmlDoc,xslDoc)
+authors = unique(xmlToDataFrame(XML::xmlParse(author_raw)))
+authors = cbind(Author_id=rownames(authors),authors)
+dbWriteTable(DBcon,name = "dimAuthor", value = authors, append = TRUE)
+```
 
+## Load articleFact
 
-
+```{r}
+xslPath = "./articleFact.xsl"
+xslDoc = read_xml(xslPath,package="xslt")
+author_raw = xml_xslt(xmlDoc,xslDoc)
+authors = unique(xmlToDataFrame(XML::xmlParse(author_raw)))
+authors = cbind(Author_id=rownames(authors),authors)
+dbWriteTable(DBcon,name = "articleFact", value = authors, append = TRUE)
+```

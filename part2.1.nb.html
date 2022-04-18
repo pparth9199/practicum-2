@@ -1514,7 +1514,9 @@ window.initializeCodeFolding = function(show) {
     showCodeButton.append(showCodeText);
     showCodeButton
         .attr('data-toggle', 'collapse')
+        .attr('data-bs-toggle', 'collapse') // BS5
         .attr('data-target', '#' + id)
+        .attr('data-bs-target', '#' + id)   // BS5
         .attr('aria-expanded', showThis)
         .attr('aria-controls', id);
 
@@ -1604,6 +1606,7 @@ if (window.hljs) {
 
 
 
+
 <style type="text/css">
 #rmd-source-code {
   display: none;
@@ -1634,6 +1637,9 @@ button.code-folding-btn:focus {
 }
 summary {
   display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
 }
 pre code {
   padding: 0;
@@ -1743,7 +1749,7 @@ pre code {
 <div id="header">
 
 <div class="btn-group pull-right float-right">
-<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
 <ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
 <li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
 <li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
@@ -1780,8 +1786,8 @@ dbfn &lt;- &quot;pubmed.db&quot;</code></pre>
 <p>Drop tables</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgc3FsXG5kcm9wIHRhYmxlIGlmIGV4aXN0cyBhcnRpY2xlUHViO1xuYGBgIn0= -->
-<pre class="sql"><code>drop table if exists articlePub;</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgc3FsXG5kcm9wIHRhYmxlIGlmIGV4aXN0cyBhcnRpY2xlRmFjdDtcbmBgYCJ9 -->
+<pre class="sql"><code>drop table if exists articleFact;</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1789,13 +1795,6 @@ dbfn &lt;- &quot;pubmed.db&quot;</code></pre>
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgc3FsXG5kcm9wIHRhYmxlIGlmIGV4aXN0cyBkaW1UaW1lO1xuYGBgIn0= -->
 <pre class="sql"><code>drop table if exists dimTime;</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgc3FsXG5kcm9wIHRhYmxlIGlmIGV4aXN0cyBkaW1Kb3VybmFsSXNzdWU7XG5gYGAifQ== -->
-<pre class="sql"><code>drop table if exists dimJournalIssue;</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1815,28 +1814,21 @@ dbfn &lt;- &quot;pubmed.db&quot;</code></pre>
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgc3FsXG5kcm9wIHRhYmxlIGlmIGV4aXN0cyBkaW1BdXRob3JMaXN0O1xuYGBgIn0= -->
-<pre class="sql"><code>drop table if exists dimAuthorList;</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgc3FsXG5kcm9wIHRhYmxlIGlmIGV4aXN0cyBBdXRob3I7XG5gYGAifQ== -->
-<pre class="sql"><code>drop table if exists Author;</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgc3FsXG5kcm9wIHRhYmxlIGlmIGV4aXN0cyBkaW1BdXRob3I7XG5gYGAifQ== -->
+<pre class="sql"><code>drop table if exists dimAuthor;</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Create tables</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgc3FsXG5DUkVBVEUgVEFCTEUgYXJ0aWNsZVB1YiAoXG4gIFBNSUQgSU5URUdFUixcbiAgSVNTTiBURVhULFxuICB0aWQgSU5URUdFUiBBVVRPX0lOQ1JFTUVOVCxcbiAgYWdncmVnYXRlIElOVEVHRVIsXG4gIFBSSU1BUlkgS0VZIChQTUlELCBJU1NOLCB0aWQpLFxuICBGT1JFSUdOIEtFWSAoUE1JRCkgUkVGRVJFTkNFUyBkaW1BcnRpY2xlKFBNSUQpLFxuICBGT1JFSUdOIEtFWSAoSVNTTikgUkVGRVJFTkNFUyBkaW1Kb3VybmFsKElTU04pLFxuICBGT1JFSUdOIEtFWSAodGlkKSBSRUZFUkVOQ0VTIGRpbVRpbWUodGlkKVxuKTtcbmBgYCJ9 -->
-<pre class="sql"><code>CREATE TABLE articlePub (
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgc3FsXG5DUkVBVEUgVEFCTEUgYXJ0aWNsZUZhY3QgKFxuICBQTUlEIElOVEVHRVIsXG4gIEF1dGhvcl9pZCBJTlRFR0VSLFxuICBJU1NOIFRFWFQsXG4gIHRpZCBJTlRFR0VSIEFVVE9fSU5DUkVNRU5ULFxuICBQUklNQVJZIEtFWSAoUE1JRCwgQXV0aG9yX2lkKSxcbiAgRk9SRUlHTiBLRVkgKFBNSUQpIFJFRkVSRU5DRVMgZGltQXJ0aWNsZShQTUlEKSxcbiAgRk9SRUlHTiBLRVkgKElTU04pIFJFRkVSRU5DRVMgZGltSm91cm5hbChJU1NOKSxcbiAgRk9SRUlHTiBLRVkgKHRpZCkgUkVGRVJFTkNFUyBkaW1UaW1lKHRpZClcbik7XG5gYGAifQ== -->
+<pre class="sql"><code>CREATE TABLE articleFact (
   PMID INTEGER,
+  Author_id INTEGER,
   ISSN TEXT,
   tid INTEGER AUTO_INCREMENT,
-  aggregate INTEGER,
-  PRIMARY KEY (PMID, ISSN, tid),
+  PRIMARY KEY (PMID, Author_id),
   FOREIGN KEY (PMID) REFERENCES dimArticle(PMID),
   FOREIGN KEY (ISSN) REFERENCES dimJournal(ISSN),
   FOREIGN KEY (tid) REFERENCES dimTime(tid)
@@ -1846,56 +1838,43 @@ dbfn &lt;- &quot;pubmed.db&quot;</code></pre>
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgc3FsXG5DUkVBVEUgVEFCTEUgZGltVGltZSAoXG4gIHRpZCBJTlRFR0VSIFBSSU1BUlkgS0VZLFxuICBZZWFyIElOVEVHRVIsXG4gIE1vbnRoIFRFWFQsXG4gIFF1YXJ0ZXIgVEVYVFxuKTtcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgc3FsXG5DUkVBVEUgVEFCTEUgZGltVGltZSAoXG4gIHRpZCBJTlRFR0VSIFBSSU1BUlkgS0VZLFxuICBZZWFyIElOVEVHRVIsXG4gIE1vbnRoIFRFWFRcbik7XG5gYGAifQ== -->
 <pre class="sql"><code>CREATE TABLE dimTime (
   tid INTEGER PRIMARY KEY,
   Year INTEGER,
-  Month TEXT,
-  Quarter TEXT
+  Month TEXT
 );</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgc3FsXG5DUkVBVEUgVEFCTEUgZGltSm91cm5hbCAoXG4gIElTU04gVEVYVCBQUklNQVJZIEtFWSxcbiAgVGl0bGUgVEVYVCxcbiAgSVNPYWJicmV2aWF0aW9uIFRFWFRcbik7XG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgc3FsXG5DUkVBVEUgVEFCTEUgZGltSm91cm5hbCAoXG4gIElTU04gVEVYVCBQUklNQVJZIEtFWSxcbiAgVGl0bGUgVEVYVCxcbiAgSVNPYWJicmV2aWF0aW9uIFRFWFQsXG4gIENpdGVkTWVkaXVtIFRFWFRcbik7XG5gYGAifQ== -->
 <pre class="sql"><code>CREATE TABLE dimJournal (
   ISSN TEXT PRIMARY KEY,
   Title TEXT,
-  ISOabbreviation TEXT
+  ISOabbreviation TEXT,
+  CitedMedium TEXT
 );</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgc3FsXG5DUkVBVEUgVEFCTEUgZGltQXJ0aWNsZSAoXG4gIFBNSUQgSU5URUdFUiBQUklNQVJZIEtFWSxcbiAgQXJ0aWNsZVRpdGxlIFRFWFQsXG4gIEFydGljbGVEYXRlIERBVEUsXG4gIExhbmd1YWdlIFRFWFQsXG4gIEF1dGhvckxpc3RfaWQgSU5URUdFUiBBVVRPX0lOQ1JFTUVOVCxcbiAgRk9SRUlHTiBLRVkgKEF1dGhvckxpc3RfaWQpIFJFRkVSRU5DRVMgZGltQXV0aG9yTGlzdChBdXRob3JMaXN0X2lkKVxuKTtcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgc3FsXG5DUkVBVEUgVEFCTEUgZGltQXJ0aWNsZSAoXG4gIFBNSUQgSU5URUdFUiBQUklNQVJZIEtFWSxcbiAgQXJ0aWNsZVRpdGxlIFRFWFQsXG4gIEFydGljbGVEYXRlIERBVEUsXG4gIExhbmd1YWdlIFRFWFRcbik7XG5gYGAifQ== -->
 <pre class="sql"><code>CREATE TABLE dimArticle (
   PMID INTEGER PRIMARY KEY,
   ArticleTitle TEXT,
   ArticleDate DATE,
-  Language TEXT,
-  AuthorList_id INTEGER AUTO_INCREMENT,
-  FOREIGN KEY (AuthorList_id) REFERENCES dimAuthorList(AuthorList_id)
+  Language TEXT
 );</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgc3FsXG5DUkVBVEUgVEFCTEUgZGltQXV0aG9yTGlzdCAoXG4gIEF1dGhvckxpc3RfaWQgSU5URUdFUiBQUklNQVJZIEtFWSxcbiAgQXV0aG9yX2lkIElOVEVHRVIsXG4gIEZPUkVJR04gS0VZIChBdXRob3JfaWQpIFJFRkVSRU5DRVMgZGltQXV0aG9yKEF1dGhvcl9pZClcbik7XG5gYGAifQ== -->
-<pre class="sql"><code>CREATE TABLE dimAuthorList (
-  AuthorList_id INTEGER PRIMARY KEY,
-  Author_id INTEGER,
-  FOREIGN KEY (Author_id) REFERENCES dimAuthor(Author_id)
-);</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgc3FsXG5DUkVBVEUgVEFCTEUgYXV0aG9yIChcbiAgQXV0aG9yX2lkIElOVEVHRVIgUFJJTUFSWSBLRVksXG4gIExhc3ROYW1lIFRFWFQsXG4gIEZvcmVOYW1lIFRFWFQsXG4gIEluaXRpYWwgVEVYVCxcbiAgQWZmaWxpYXRpb24gVEVYVFxuKTtcbmBgYCJ9 -->
-<pre class="sql"><code>CREATE TABLE author (
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgc3FsXG5DUkVBVEUgVEFCTEUgZGltQXV0aG9yIChcbiAgQXV0aG9yX2lkIElOVEVHRVIgUFJJTUFSWSBLRVksXG4gIExhc3ROYW1lIFRFWFQsXG4gIEZvcmVOYW1lIFRFWFQsXG4gIEluaXRpYWwgVEVYVCxcbiAgQWZmaWxpYXRpb24gVEVYVFxuKTtcbmBgYCJ9 -->
+<pre class="sql"><code>CREATE TABLE dimAuthor (
   Author_id INTEGER PRIMARY KEY,
   LastName TEXT,
   ForeName TEXT,
@@ -1905,23 +1884,68 @@ dbfn &lt;- &quot;pubmed.db&quot;</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<div id="insert-data" class="section level1">
+<h1>Insert Data</h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgc3FsXG5JTlNFUlQgSU5UTyBhcnRpY2xlRmFjdChQTUlELCBBdXRob3JfaWQsIElTU04sIHRpZClcblNFTEVDVCBBcnRpY2xlLlBNSUQsIEF1dGhvcl9yZWYuQXV0aG9yX2lkLCBKb3VybmFsLklTU05cbkZST00gQXV0aG9yX3JlZiBMRUZUIEpPSU4gQXJ0aWNsZVxuT04gQXJ0aWNsZS5QTUlEID09IEF1dGhvcl9yZWYuUE1JRFxuTEVGVCBKT0lOIEpvdXJuYWxcbk9OIEFydGljbGUual9pZCA9IEpvdXJuYWwual9pZFxuYGBgIn0= -->
+<pre class="sql"><code>INSERT INTO articleFact(PMID, Author_id, ISSN, tid)
+SELECT Article.PMID, Author_ref.Author_id, Journal.ISSN
+FROM Author_ref LEFT JOIN Article
+ON Article.PMID == Author_ref.PMID
+LEFT JOIN Journal
+ON Article.j_id = Journal.j_id</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgc3FsXG5JTlNFUlQgSU5UTyBkaW1Kb3VybmFsKElTU04sIFRpdGxlLCBJU09hYmJyZXZpYXRpb24sIENpdGVkTWVkaXVtKVxuU0VMRUNUIElTU04sIFRpdGxlLCBJU09hYmJyZXZpYXRpb24sIENpdGVkTWVkaXVtXG5GUk9NIEpvdXJuYWxcbmBgYCJ9 -->
+<pre class="sql"><code>INSERT INTO dimJournal(ISSN, Title, ISOabbreviation, CitedMedium)
+SELECT ISSN, Title, ISOabbreviation, CitedMedium
+FROM Journal</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgc3FsXG5JTlNFUlQgSU5UTyBkaW1UaW1lKHRpZCwgWWVhciwgTW9udGgpXG5TRUxFQ1QgYXJ0aWNsZUZhY3QudGlkLCBKb3VybmFsLlllYXIsIEpvdXJuYWwuTW9udGhcbkZST00gYXJ0aWNsZUZhY3QgTEVGVCBKT0lOIEFydGljbGVcbk9OIGFydGljbGVGYWN0LlBNSUQgPSBBcnRpY2xlLlBNSURcbkxFRlQgSk9JTiBKb3VybmFsXG5PTiBBcnRpY2xlLmpfaWQgPSBKb3VybmFsLmpfaWRcbmBgYCJ9 -->
+<pre class="sql"><code>INSERT INTO dimTime(tid, Year, Month)
+SELECT articleFact.tid, Journal.Year, Journal.Month
+FROM articleFact LEFT JOIN Article
+ON articleFact.PMID = Article.PMID
+LEFT JOIN Journal
+ON Article.j_id = Journal.j_id</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgc3FsXG5JTlNFUlQgSU5UTyBkaW1BcnRpY2xlKFBNSUQsIEFydGljbGVUaXRsZSwgQXJ0aWNsZURhdGUsIExhbmd1YWdlKVxuU0VMRUNUIFBNSUQsIEFydGljbGVUaXRsZSwgQXJ0aWNsZURhdGUsIExhbmd1YWdlXG5GUk9NIEFydGljbGVcbmBgYCJ9 -->
+<pre class="sql"><code>INSERT INTO dimArticle(PMID, ArticleTitle, ArticleDate, Language)
+SELECT PMID, ArticleTitle, ArticleDate, Language
+FROM Article</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgc3FsXG5JTlNFUlQgSU5UTyBkaW1BdXRob3IoQXV0aG9yX2lkLCBMYXN0TmFtZSwgRm9yZU5hbWUsIEluaXRpYWwsIEFmZmlsaWF0aW9uKVxuU0VMRUNUIEF1dGhvcl9pZCwgTGFzdE5hbWUsIEZvZXJOYW1lLCBJbml0aWFsLCBBZmZpbGlhdGlvblxuRlJPTSBBdXRob3JcbmBgYCJ9 -->
+<pre class="sql"><code>INSERT INTO dimAuthor(Author_id, LastName, ForeName, Initial, Affiliation)
+SELECT Author_id, LastName, FoerName, Initial, Affiliation
+FROM Author</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
 <div id="loading-libraries" class="section level1">
 <h1>Loading Libraries</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShYTUwpXG5gYGAifQ== -->
-<pre class="r"><code>library(XML)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShYTUwpXG5saWJyYXJ5KHhzbHQpXG5gYGAifQ== -->
+<pre class="r"><code>library(XML)
+library(xslt)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiV2FybmluZyBtZXNzYWdlOlxuY2FsbCBkYkRpc2Nvbm5lY3QoKSB3aGVuIGZpbmlzaGVkIHdvcmtpbmcgd2l0aCBhIGNvbm5lY3Rpb24gXG4ifQ== -->
-<pre><code>Warning message:
-call dbDisconnect() when finished working with a connection </code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeSh4c2x0KVxuYGBgIn0= -->
-<pre class="r"><code>library(xslt)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiTG9hZGluZyByZXF1aXJlZCBwYWNrYWdlOiB4bWwyXG4ifQ== -->
-<pre><code>Loading required package: xml2</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
@@ -1942,24 +1966,48 @@ xmlDoc = read_xml(xmlPath)</code></pre>
 <h2>Load dimJournal table</h2>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBFeHRyYWN0IEpvdXJuYWwgRGF0YVxueHNsUGF0aCA9IFwiLi9qb3VybmFsLnhzbFwiXG54c2xEb2MgPSByZWFkX3htbCh4c2xQYXRoLHBhY2thZ2U9XCJ4c2x0XCIpXG5qb3VybmFsX3JhdyA9IHhtbF94c2x0KHhtbERvYyx4c2xEb2MpXG5qb3VybmFscyA9IHVuaXF1ZSh4bWxUb0RhdGFGcmFtZShYTUw6OnhtbFBhcnNlKGpvdXJuYWxfcmF3KSkpXG5kYldyaXRlVGFibGUoREJjb24sbmFtZSA9IFwiZGltSm91cm5hbFwiLCB2YWx1ZSA9IGpvdXJuYWxzLCBhcHBlbmQgPSBUUlVFKVxuYGBgIn0= -->
-<pre class="r"><code># Extract Journal Data
-xslPath = &quot;./journal.xsl&quot;
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxueHNsUGF0aCA9IFwiLi9qb3VybmFsLnhzbFwiXG54c2xEb2MgPSByZWFkX3htbCh4c2xQYXRoLHBhY2thZ2U9XCJ4c2x0XCIpXG5qb3VybmFsX3JhdyA9IHhtbF94c2x0KHhtbERvYyx4c2xEb2MpXG5qb3VybmFscyA9IHVuaXF1ZSh4bWxUb0RhdGFGcmFtZShYTUw6OnhtbFBhcnNlKGpvdXJuYWxfcmF3KSkpXG5kYldyaXRlVGFibGUoREJjb24sbmFtZSA9IFwiZGltSm91cm5hbFwiLCB2YWx1ZSA9IGpvdXJuYWxzLCBhcHBlbmQgPSBUUlVFKVxuYGBgIn0= -->
+<pre class="r"><code>xslPath = &quot;./journal.xsl&quot;
 xslDoc = read_xml(xslPath,package=&quot;xslt&quot;)
 journal_raw = xml_xslt(xmlDoc,xslDoc)
 journals = unique(xmlToDataFrame(XML::xmlParse(journal_raw)))
 dbWriteTable(DBcon,name = &quot;dimJournal&quot;, value = journals, append = TRUE)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiV2FybmluZzogQ29sdW1uIG5hbWVzIHdpbGwgYmUgbWF0Y2hlZCBpZ25vcmluZyBjaGFyYWN0ZXIgY2FzZVxuIn0= -->
-<pre><code>Warning: Column names will be matched ignoring character case</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+</div>
+<div id="load-author-table" class="section level2">
+<h2>Load Author table</h2>
 <!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxueHNsUGF0aCA9IFwiLi9hdXRob3IueHNsXCJcbnhzbERvYyA9IHJlYWRfeG1sKHhzbFBhdGgscGFja2FnZT1cInhzbHRcIilcbmF1dGhvcl9yYXcgPSB4bWxfeHNsdCh4bWxEb2MseHNsRG9jKVxuYXV0aG9ycyA9IHVuaXF1ZSh4bWxUb0RhdGFGcmFtZShYTUw6OnhtbFBhcnNlKGF1dGhvcl9yYXcpKSlcbmF1dGhvcnMgPSBjYmluZChBdXRob3JfaWQ9cm93bmFtZXMoYXV0aG9ycyksYXV0aG9ycylcbmRiV3JpdGVUYWJsZShEQmNvbixuYW1lID0gXCJkaW1BdXRob3JcIiwgdmFsdWUgPSBhdXRob3JzLCBhcHBlbmQgPSBUUlVFKVxuYGBgIn0= -->
+<pre class="r"><code>xslPath = &quot;./author.xsl&quot;
+xslDoc = read_xml(xslPath,package=&quot;xslt&quot;)
+author_raw = xml_xslt(xmlDoc,xslDoc)
+authors = unique(xmlToDataFrame(XML::xmlParse(author_raw)))
+authors = cbind(Author_id=rownames(authors),authors)
+dbWriteTable(DBcon,name = &quot;dimAuthor&quot;, value = authors, append = TRUE)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="load-articlefact" class="section level2">
+<h2>Load articleFact</h2>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxueHNsUGF0aCA9IFwiLi9hcnRpY2xlRmFjdC54c2xcIlxueHNsRG9jID0gcmVhZF94bWwoeHNsUGF0aCxwYWNrYWdlPVwieHNsdFwiKVxuYXV0aG9yX3JhdyA9IHhtbF94c2x0KHhtbERvYyx4c2xEb2MpXG5hdXRob3JzID0gdW5pcXVlKHhtbFRvRGF0YUZyYW1lKFhNTDo6eG1sUGFyc2UoYXV0aG9yX3JhdykpKVxuYXV0aG9ycyA9IGNiaW5kKEF1dGhvcl9pZD1yb3duYW1lcyhhdXRob3JzKSxhdXRob3JzKVxuZGJXcml0ZVRhYmxlKERCY29uLG5hbWUgPSBcImFydGljbGVGYWN0XCIsIHZhbHVlID0gYXV0aG9ycywgYXBwZW5kID0gVFJVRSlcbmBgYCJ9 -->
+<pre class="r"><code>xslPath = &quot;./articleFact.xsl&quot;
+xslDoc = read_xml(xslPath,package=&quot;xslt&quot;)
+author_raw = xml_xslt(xmlDoc,xslDoc)
+authors = unique(xmlToDataFrame(XML::xmlParse(author_raw)))
+authors = cbind(Author_id=rownames(authors),authors)
+dbWriteTable(DBcon,name = &quot;articleFact&quot;, value = authors, append = TRUE)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
 </div>
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQotLS0NCnRpdGxlOiAiUiBOb3RlYm9vayINCm91dHB1dDoNCiAgaHRtbF9kb2N1bWVudDoNCiAgICBkZl9wcmludDogcGFnZWQNCi0tLQ0KDQpgYGB7cn0NCmxpYnJhcnkoUlNRTGl0ZSkNCmBgYA0KDQpgYGB7cn0NCmZuIDwtICJwdWJtZWRfc2FtcGxlLnhtbCINCmRiZm4gPC0gInB1Ym1lZC5kYiINCmBgYA0KDQpgYGB7ciwgaW5jbHVkZT1GQUxTRX0NCkRCY29uIDwtIGRiQ29ubmVjdChSU1FMaXRlOjpTUUxpdGUoKSwgZGJmbikNCmRiRXhlY3V0ZShEQmNvbiwgIlBSQUdNQSBmb3JlaWduX2tleXMgPSBPTiIpDQpgYGANCg0KRHJvcCB0YWJsZXMNCmBgYHtzcWwgY29ubmVjdGlvbiA9ICJEQmNvbiJ9DQpkcm9wIHRhYmxlIGlmIGV4aXN0cyBhcnRpY2xlUHViOw0KYGBgDQoNCmBgYHtzcWwgY29ubmVjdGlvbiA9ICJEQmNvbiJ9DQpkcm9wIHRhYmxlIGlmIGV4aXN0cyBkaW1UaW1lOw0KYGBgDQoNCmBgYHtzcWwgY29ubmVjdGlvbiA9ICJEQmNvbiJ9DQpkcm9wIHRhYmxlIGlmIGV4aXN0cyBkaW1Kb3VybmFsSXNzdWU7DQpgYGANCg0KYGBge3NxbCBjb25uZWN0aW9uID0gIkRCY29uIn0NCmRyb3AgdGFibGUgaWYgZXhpc3RzIGRpbUpvdXJuYWw7DQpgYGANCg0KYGBge3NxbCBjb25uZWN0aW9uID0gIkRCY29uIn0NCmRyb3AgdGFibGUgaWYgZXhpc3RzIGRpbUFydGljbGU7DQpgYGANCg0KYGBge3NxbCBjb25uZWN0aW9uID0gIkRCY29uIn0NCmRyb3AgdGFibGUgaWYgZXhpc3RzIGRpbUF1dGhvckxpc3Q7DQpgYGANCg0KYGBge3NxbCBjb25uZWN0aW9uID0gIkRCY29uIn0NCmRyb3AgdGFibGUgaWYgZXhpc3RzIEF1dGhvcjsNCmBgYA0KDQpDcmVhdGUgdGFibGVzDQpgYGB7c3FsIGNvbm5lY3Rpb24gPSAiREJjb24ifQ0KQ1JFQVRFIFRBQkxFIGFydGljbGVQdWIgKA0KICBQTUlEIElOVEVHRVIsDQogIElTU04gVEVYVCwNCiAgdGlkIElOVEVHRVIgQVVUT19JTkNSRU1FTlQsDQogIGFnZ3JlZ2F0ZSBJTlRFR0VSLA0KICBQUklNQVJZIEtFWSAoUE1JRCwgSVNTTiwgdGlkKSwNCiAgRk9SRUlHTiBLRVkgKFBNSUQpIFJFRkVSRU5DRVMgZGltQXJ0aWNsZShQTUlEKSwNCiAgRk9SRUlHTiBLRVkgKElTU04pIFJFRkVSRU5DRVMgZGltSm91cm5hbChJU1NOKSwNCiAgRk9SRUlHTiBLRVkgKHRpZCkgUkVGRVJFTkNFUyBkaW1UaW1lKHRpZCkNCik7DQpgYGANCg0KDQpgYGB7c3FsIGNvbm5lY3Rpb24gPSAiREJjb24ifQ0KQ1JFQVRFIFRBQkxFIGRpbVRpbWUgKA0KICB0aWQgSU5URUdFUiBQUklNQVJZIEtFWSwNCiAgWWVhciBJTlRFR0VSLA0KICBNb250aCBURVhULA0KICBRdWFydGVyIFRFWFQNCik7DQpgYGANCg0KYGBge3NxbCBjb25uZWN0aW9uID0gIkRCY29uIn0NCkNSRUFURSBUQUJMRSBkaW1Kb3VybmFsICgNCiAgSVNTTiBURVhUIFBSSU1BUlkgS0VZLA0KICBUaXRsZSBURVhULA0KICBJU09hYmJyZXZpYXRpb24gVEVYVA0KKTsNCmBgYA0KDQpgYGB7c3FsIGNvbm5lY3Rpb24gPSAiREJjb24ifQ0KQ1JFQVRFIFRBQkxFIGRpbUFydGljbGUgKA0KICBQTUlEIElOVEVHRVIgUFJJTUFSWSBLRVksDQogIEFydGljbGVUaXRsZSBURVhULA0KICBBcnRpY2xlRGF0ZSBEQVRFLA0KICBMYW5ndWFnZSBURVhULA0KICBBdXRob3JMaXN0X2lkIElOVEVHRVIgQVVUT19JTkNSRU1FTlQsDQogIEZPUkVJR04gS0VZIChBdXRob3JMaXN0X2lkKSBSRUZFUkVOQ0VTIGRpbUF1dGhvckxpc3QoQXV0aG9yTGlzdF9pZCkNCik7DQpgYGANCg0KYGBge3NxbCBjb25uZWN0aW9uID0gIkRCY29uIn0NCkNSRUFURSBUQUJMRSBkaW1BdXRob3JMaXN0ICgNCiAgQXV0aG9yTGlzdF9pZCBJTlRFR0VSIFBSSU1BUlkgS0VZLA0KICBBdXRob3JfaWQgSU5URUdFUiwNCiAgRk9SRUlHTiBLRVkgKEF1dGhvcl9pZCkgUkVGRVJFTkNFUyBkaW1BdXRob3IoQXV0aG9yX2lkKQ0KKTsNCmBgYA0KDQpgYGB7c3FsIGNvbm5lY3Rpb24gPSAiREJjb24ifQ0KQ1JFQVRFIFRBQkxFIGF1dGhvciAoDQogIEF1dGhvcl9pZCBJTlRFR0VSIFBSSU1BUlkgS0VZLA0KICBMYXN0TmFtZSBURVhULA0KICBGb3JlTmFtZSBURVhULA0KICBJbml0aWFsIFRFWFQsDQogIEFmZmlsaWF0aW9uIFRFWFQNCik7DQpgYGANCg0KIyBMb2FkaW5nIExpYnJhcmllcw0KYGBge3Igd2FybmluZz1GQUxTRX0NCmxpYnJhcnkoWE1MKQ0KbGlicmFyeSh4c2x0KQ0KYGBgDQoNCiMgTG9hZCBYTUwgZGF0YSB0byBkYXRhYmFzZQ0KIyMgUmVhZCBYTUwgZmlsZQ0KYGBge3J9DQp4bWxQYXRoIDwtICIuL3B1Ym1lZF9zYW1wbGUueG1sIg0KeG1sRG9jID0gcmVhZF94bWwoeG1sUGF0aCkNCmBgYA0KDQojIyBMb2FkIGRpbUpvdXJuYWwgdGFibGUNCmBgYHtyfQ0KIyBFeHRyYWN0IEpvdXJuYWwgRGF0YQ0KeHNsUGF0aCA9ICIuL2pvdXJuYWwueHNsIg0KeHNsRG9jID0gcmVhZF94bWwoeHNsUGF0aCxwYWNrYWdlPSJ4c2x0IikNCmpvdXJuYWxfcmF3ID0geG1sX3hzbHQoeG1sRG9jLHhzbERvYykNCmpvdXJuYWxzID0gdW5pcXVlKHhtbFRvRGF0YUZyYW1lKFhNTDo6eG1sUGFyc2Uoam91cm5hbF9yYXcpKSkNCmRiV3JpdGVUYWJsZShEQmNvbixuYW1lID0gImRpbUpvdXJuYWwiLCB2YWx1ZSA9IGpvdXJuYWxzLCBhcHBlbmQgPSBUUlVFKQ0KYGBgDQoNCg0KDQoNCg0K</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQotLS0NCnRpdGxlOiAiUiBOb3RlYm9vayINCm91dHB1dDoNCiAgaHRtbF9kb2N1bWVudDoNCiAgICBkZl9wcmludDogcGFnZWQNCi0tLQ0KDQpgYGB7cn0NCmxpYnJhcnkoUlNRTGl0ZSkNCmBgYA0KDQpgYGB7cn0NCmZuIDwtICJwdWJtZWRfc2FtcGxlLnhtbCINCmRiZm4gPC0gInB1Ym1lZC5kYiINCmBgYA0KDQpgYGB7ciwgaW5jbHVkZT1GQUxTRX0NCkRCY29uIDwtIGRiQ29ubmVjdChSU1FMaXRlOjpTUUxpdGUoKSwgZGJmbikNCmRiRXhlY3V0ZShEQmNvbiwgIlBSQUdNQSBmb3JlaWduX2tleXMgPSBPTiIpDQpgYGANCg0KRHJvcCB0YWJsZXMNCg0KYGBge3NxbCBjb25uZWN0aW9uID0gIkRCY29uIn0NCmRyb3AgdGFibGUgaWYgZXhpc3RzIGFydGljbGVGYWN0Ow0KYGBgDQoNCmBgYHtzcWwgY29ubmVjdGlvbiA9ICJEQmNvbiJ9DQpkcm9wIHRhYmxlIGlmIGV4aXN0cyBkaW1UaW1lOw0KYGBgDQoNCmBgYHtzcWwgY29ubmVjdGlvbiA9ICJEQmNvbiJ9DQpkcm9wIHRhYmxlIGlmIGV4aXN0cyBkaW1Kb3VybmFsOw0KYGBgDQoNCmBgYHtzcWwgY29ubmVjdGlvbiA9ICJEQmNvbiJ9DQpkcm9wIHRhYmxlIGlmIGV4aXN0cyBkaW1BcnRpY2xlOw0KYGBgDQoNCmBgYHtzcWwgY29ubmVjdGlvbiA9ICJEQmNvbiJ9DQpkcm9wIHRhYmxlIGlmIGV4aXN0cyBkaW1BdXRob3I7DQpgYGANCg0KQ3JlYXRlIHRhYmxlcw0KDQpgYGB7c3FsIGNvbm5lY3Rpb24gPSAiREJjb24ifQ0KQ1JFQVRFIFRBQkxFIGFydGljbGVGYWN0ICgNCiAgUE1JRCBJTlRFR0VSLA0KICBBdXRob3JfaWQgSU5URUdFUiwNCiAgSVNTTiBURVhULA0KICB0aWQgSU5URUdFUiBBVVRPX0lOQ1JFTUVOVCwNCiAgUFJJTUFSWSBLRVkgKFBNSUQsIEF1dGhvcl9pZCksDQogIEZPUkVJR04gS0VZIChQTUlEKSBSRUZFUkVOQ0VTIGRpbUFydGljbGUoUE1JRCksDQogIEZPUkVJR04gS0VZIChJU1NOKSBSRUZFUkVOQ0VTIGRpbUpvdXJuYWwoSVNTTiksDQogIEZPUkVJR04gS0VZICh0aWQpIFJFRkVSRU5DRVMgZGltVGltZSh0aWQpDQopOw0KYGBgDQoNCmBgYHtzcWwgY29ubmVjdGlvbiA9ICJEQmNvbiJ9DQpDUkVBVEUgVEFCTEUgZGltVGltZSAoDQogIHRpZCBJTlRFR0VSIFBSSU1BUlkgS0VZLA0KICBZZWFyIElOVEVHRVIsDQogIE1vbnRoIFRFWFQNCik7DQpgYGANCg0KYGBge3NxbCBjb25uZWN0aW9uID0gIkRCY29uIn0NCkNSRUFURSBUQUJMRSBkaW1Kb3VybmFsICgNCiAgSVNTTiBURVhUIFBSSU1BUlkgS0VZLA0KICBUaXRsZSBURVhULA0KICBJU09hYmJyZXZpYXRpb24gVEVYVCwNCiAgQ2l0ZWRNZWRpdW0gVEVYVA0KKTsNCmBgYA0KDQpgYGB7c3FsIGNvbm5lY3Rpb24gPSAiREJjb24ifQ0KQ1JFQVRFIFRBQkxFIGRpbUFydGljbGUgKA0KICBQTUlEIElOVEVHRVIgUFJJTUFSWSBLRVksDQogIEFydGljbGVUaXRsZSBURVhULA0KICBBcnRpY2xlRGF0ZSBEQVRFLA0KICBMYW5ndWFnZSBURVhUDQopOw0KYGBgDQoNCmBgYHtzcWwgY29ubmVjdGlvbiA9ICJEQmNvbiJ9DQpDUkVBVEUgVEFCTEUgZGltQXV0aG9yICgNCiAgQXV0aG9yX2lkIElOVEVHRVIgUFJJTUFSWSBLRVksDQogIExhc3ROYW1lIFRFWFQsDQogIEZvcmVOYW1lIFRFWFQsDQogIEluaXRpYWwgVEVYVCwNCiAgQWZmaWxpYXRpb24gVEVYVA0KKTsNCmBgYA0KDQojIEluc2VydCBEYXRhDQoNCmBgYHtzcWwgY29ubmVjdGlvbiA9ICJEQmNvbiJ9DQpJTlNFUlQgSU5UTyBhcnRpY2xlRmFjdChQTUlELCBBdXRob3JfaWQsIElTU04sIHRpZCkNClNFTEVDVCBBcnRpY2xlLlBNSUQsIEF1dGhvcl9yZWYuQXV0aG9yX2lkLCBKb3VybmFsLklTU04NCkZST00gQXV0aG9yX3JlZiBMRUZUIEpPSU4gQXJ0aWNsZQ0KT04gQXJ0aWNsZS5QTUlEID09IEF1dGhvcl9yZWYuUE1JRA0KTEVGVCBKT0lOIEpvdXJuYWwNCk9OIEFydGljbGUual9pZCA9IEpvdXJuYWwual9pZA0KYGBgDQoNCmBgYHtzcWwgY29ubmVjdGlvbiA9ICJEQmNvbiJ9DQpJTlNFUlQgSU5UTyBkaW1Kb3VybmFsKElTU04sIFRpdGxlLCBJU09hYmJyZXZpYXRpb24sIENpdGVkTWVkaXVtKQ0KU0VMRUNUIElTU04sIFRpdGxlLCBJU09hYmJyZXZpYXRpb24sIENpdGVkTWVkaXVtDQpGUk9NIEpvdXJuYWwNCmBgYA0KDQpgYGB7c3FsIGNvbm5lY3Rpb24gPSAiREJjb24ifQ0KSU5TRVJUIElOVE8gZGltVGltZSh0aWQsIFllYXIsIE1vbnRoKQ0KU0VMRUNUIGFydGljbGVGYWN0LnRpZCwgSm91cm5hbC5ZZWFyLCBKb3VybmFsLk1vbnRoDQpGUk9NIGFydGljbGVGYWN0IExFRlQgSk9JTiBBcnRpY2xlDQpPTiBhcnRpY2xlRmFjdC5QTUlEID0gQXJ0aWNsZS5QTUlEDQpMRUZUIEpPSU4gSm91cm5hbA0KT04gQXJ0aWNsZS5qX2lkID0gSm91cm5hbC5qX2lkDQpgYGANCg0KYGBge3NxbCBjb25uZWN0aW9uID0gIkRCY29uIn0NCklOU0VSVCBJTlRPIGRpbUFydGljbGUoUE1JRCwgQXJ0aWNsZVRpdGxlLCBBcnRpY2xlRGF0ZSwgTGFuZ3VhZ2UpDQpTRUxFQ1QgUE1JRCwgQXJ0aWNsZVRpdGxlLCBBcnRpY2xlRGF0ZSwgTGFuZ3VhZ2UNCkZST00gQXJ0aWNsZQ0KYGBgDQoNCmBgYHtzcWwgY29ubmVjdGlvbiA9ICJEQmNvbiJ9DQpJTlNFUlQgSU5UTyBkaW1BdXRob3IoQXV0aG9yX2lkLCBMYXN0TmFtZSwgRm9yZU5hbWUsIEluaXRpYWwsIEFmZmlsaWF0aW9uKQ0KU0VMRUNUIEF1dGhvcl9pZCwgTGFzdE5hbWUsIEZvZXJOYW1lLCBJbml0aWFsLCBBZmZpbGlhdGlvbg0KRlJPTSBBdXRob3INCmBgYA0KDQoNCg0KDQoNCg0KIyBMb2FkaW5nIExpYnJhcmllcw0KDQpgYGB7ciB3YXJuaW5nPUZBTFNFfQ0KbGlicmFyeShYTUwpDQpsaWJyYXJ5KHhzbHQpDQpgYGANCg0KIyBMb2FkIFhNTCBkYXRhIHRvIGRhdGFiYXNlDQoNCiMjIFJlYWQgWE1MIGZpbGUNCg0KYGBge3J9DQp4bWxQYXRoIDwtICIuL3B1Ym1lZF9zYW1wbGUueG1sIg0KeG1sRG9jID0gcmVhZF94bWwoeG1sUGF0aCkNCmBgYA0KDQojIyBMb2FkIGRpbUpvdXJuYWwgdGFibGUNCg0KYGBge3J9DQp4c2xQYXRoID0gIi4vam91cm5hbC54c2wiDQp4c2xEb2MgPSByZWFkX3htbCh4c2xQYXRoLHBhY2thZ2U9InhzbHQiKQ0Kam91cm5hbF9yYXcgPSB4bWxfeHNsdCh4bWxEb2MseHNsRG9jKQ0Kam91cm5hbHMgPSB1bmlxdWUoeG1sVG9EYXRhRnJhbWUoWE1MOjp4bWxQYXJzZShqb3VybmFsX3JhdykpKQ0KZGJXcml0ZVRhYmxlKERCY29uLG5hbWUgPSAiZGltSm91cm5hbCIsIHZhbHVlID0gam91cm5hbHMsIGFwcGVuZCA9IFRSVUUpDQpgYGANCg0KIyMgTG9hZCBBdXRob3IgdGFibGUNCg0KYGBge3J9DQp4c2xQYXRoID0gIi4vYXV0aG9yLnhzbCINCnhzbERvYyA9IHJlYWRfeG1sKHhzbFBhdGgscGFja2FnZT0ieHNsdCIpDQphdXRob3JfcmF3ID0geG1sX3hzbHQoeG1sRG9jLHhzbERvYykNCmF1dGhvcnMgPSB1bmlxdWUoeG1sVG9EYXRhRnJhbWUoWE1MOjp4bWxQYXJzZShhdXRob3JfcmF3KSkpDQphdXRob3JzID0gY2JpbmQoQXV0aG9yX2lkPXJvd25hbWVzKGF1dGhvcnMpLGF1dGhvcnMpDQpkYldyaXRlVGFibGUoREJjb24sbmFtZSA9ICJkaW1BdXRob3IiLCB2YWx1ZSA9IGF1dGhvcnMsIGFwcGVuZCA9IFRSVUUpDQpgYGANCg0KIyMgTG9hZCBhcnRpY2xlRmFjdA0KDQpgYGB7cn0NCnhzbFBhdGggPSAiLi9hcnRpY2xlRmFjdC54c2wiDQp4c2xEb2MgPSByZWFkX3htbCh4c2xQYXRoLHBhY2thZ2U9InhzbHQiKQ0KYXV0aG9yX3JhdyA9IHhtbF94c2x0KHhtbERvYyx4c2xEb2MpDQphdXRob3JzID0gdW5pcXVlKHhtbFRvRGF0YUZyYW1lKFhNTDo6eG1sUGFyc2UoYXV0aG9yX3JhdykpKQ0KYXV0aG9ycyA9IGNiaW5kKEF1dGhvcl9pZD1yb3duYW1lcyhhdXRob3JzKSxhdXRob3JzKQ0KZGJXcml0ZVRhYmxlKERCY29uLG5hbWUgPSAiYXJ0aWNsZUZhY3QiLCB2YWx1ZSA9IGF1dGhvcnMsIGFwcGVuZCA9IFRSVUUpDQpgYGANCg==</div>
 
 
 
