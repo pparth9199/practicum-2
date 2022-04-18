@@ -54,10 +54,6 @@ Drop table Journal.
 drop table if exists Journal;
 ```
 
-Drop table ElocationId
-```{sql connection = "DBcon"}
-drop table if exists ElocationId;
-```
 
 Drop table PubType
 ```{sql connection = "DBcon"}
@@ -141,17 +137,7 @@ create table Abstract (
 );
 ```
 
-Create Table Elocation Id
 
-```{sql connection=DBcon}
-create table ElocationId (
-  Elocation_Index_Id integer PRIMARY KEY AUTOINCREMENT,
-  PMID integer NOT NULL,
-  ElocationId text,
-  foreign key (PMID) references Article(PMID)
-);
-
-```
 
 
 
