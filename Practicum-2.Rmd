@@ -1,6 +1,8 @@
 ---
 title: "R Notebook"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 ### Part 1.2 Realize the Relational Schema in SQLite
 
@@ -63,13 +65,13 @@ drop table if exists PubType;
 Create table Journal
 ```{sql connection = "DBcon"}
 create table Journal (
-  J_Id integer PRIMARY KEY AUTOINCREMENT,
+  j_Id integer PRIMARY KEY AUTOINCREMENT,
   ISSN text,
   Volume integer NOT NULL,
   Issue integer NOT NULL,
   CiteMedium text NOT NULL,
   Title text NOT NULL,
-  ISOAbbreviation text NOT NULL,
+  ISOabbreviation text NOT NULL,
   Year integer,
   Month Text
 );
@@ -79,7 +81,7 @@ Create table Article
 ```{sql connection = "DBcon"}
 create table Article (
   PMID integer,
-  J_Id integer,
+  j_Id integer,
   ArticleTitle text NOT NULL,
   Pagination text,
   Language text NOT NULL,
@@ -136,10 +138,6 @@ create table Abstract (
   foreign key (PMID) references Article(PMID)
 );
 ```
-
-
-
-
 
 Closing DB connection
 ```{r}
