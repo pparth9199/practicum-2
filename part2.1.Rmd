@@ -1,5 +1,10 @@
 ---
 title: "R Notebook"
+output: html_notebook
+---
+
+---
+title: "R Notebook"
 output:
   html_document:
     df_print: paged
@@ -58,7 +63,7 @@ CREATE TABLE articlePub (
   PRIMARY KEY (PMID, ISSN, tid),
   FOREIGN KEY (PMID) REFERENCES dimArticle(PMID),
   FOREIGN KEY (ISSN) REFERENCES dimJournal(ISSN),
-  FOREIGN KEY (tid) REFERENCES dimTime(tid),
+  FOREIGN KEY (tid) REFERENCES dimTime(tid)
 );
 ```
 
@@ -95,7 +100,7 @@ CREATE TABLE dimArticle (
 CREATE TABLE dimAuthorList (
   AuthorList_id INTEGER PRIMARY KEY,
   Author_id INTEGER,
-  FOREIGN KEY (Author_id) REFERENCES ON dimAuthor(Author_id)
+  FOREIGN KEY (Author_id) REFERENCES dimAuthor(Author_id)
 );
 ```
 
@@ -109,60 +114,30 @@ CREATE TABLE author (
 );
 ```
 
-Insert data
-```{sql connection = "DBcon"}
-INSERT INTO articlePub(PMID, ISSN)
-SELECT Article.PMID, Journal.ISSN
-FROM Article NATURAL JOIN Journal
+# Loading Libraries
+```{r warning=FALSE}
+library(XML)
+library(xslt)
 ```
 
-```{sql connection = "DBcon"}
-INSERT INTO dimTime(tid, Year, Month, Quarter)
-SELECT articlePub.tid, Journal.Year, Journal.Month, ((Journal.Month - 1) div 3) + 1
-FROM articlePub LEFT JOIN Article
-ON articlePub.PMID = Article.PMID
-LEFT JOIN Journal
-ON Article.j_id = Journal.j_id
+# Load XML data to database
+## Read XML file
+```{r}
+xmlPath <- "./pubmed_sample.xml"
+xmlDoc = read_xml(xmlPath)
 ```
 
-```{sql connection = "DBcon"}
-INSERT INTO dimJournal(ISSN, Title, ISOabbreviation)
-SELECT DISTINCT ISSN, Title, ISOabbreviation
-FROM Journal
+## Load dimJournal table
+```{r}
+# Extract Journal Data
+xslPath = "./journal.xsl"
+xslDoc = read_xml(xslPath,package="xslt")
+journal_raw = xml_xslt(xmlDoc,xslDoc)
+journals = unique(xmlToDataFrame(XML::xmlParse(journal_raw)))
+dbWriteTable(DBcon,name = "dimJournal", value = journals, append = TRUE)
 ```
 
-```{sql connection = "DBcon"}
-INSERT INTO dimArticle
-SELECT PMID, ArticleTitle, ArticleDate, Language
-FROM Article
-```
 
-```{sql connection = "DBcon"}
-INSERT INTO dimArticle
-SELECT PMID, ArticleTitle, ArticleDate, Language
-FROM Article
-```
 
-```{sql connection = "DBcon"}
-INSERT INTO dimAuthorList
-SELECT dimArticle.AuthorList_id, Author.Author_id
-FROM dimArticle LEFT JOIN Author
-ON dimArticle.PMID = Author.PMID
-```
 
-```{sql connection = "DBcon"}
-INSERT INTO author
-SELECT Author_id, LastName, ForeName, Initial, Affiliation
-FROM Author
-```
 
-```{sql connection = "DBcon"}
-INSERT INTO articlePub(aggregate)
-SELECT COUNT(*) aggregate
-FROM Article NATURAL JOIN Journal
-LEFT JOIN Author
-ON Article.PMID = Author.PMID
-LEFT JOIN dimTime
-ON dimTime.tid = article.tid
-GROUP BY Author.ForeName, Journal.Title, Journal.Year, dimTime.Quarter
-```
