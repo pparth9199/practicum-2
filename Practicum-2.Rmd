@@ -41,6 +41,11 @@ Drop table Author
 drop table if exists Author;
 ```
 
+Drop table Author_ref
+```{sql connection = "DBcon"}
+drop table if exists Author_ref;
+```
+
 Drop table Abstract
 ```{sql connection = "DBcon"}
 drop table if exists Abstract;
@@ -71,7 +76,7 @@ create table Journal (
   Issue integer NOT NULL,
   CiteMedium text NOT NULL,
   Title text NOT NULL,
-  ISOabbreviation text NOT NULL,
+  ISOAbbreviation text NOT NULL,
   Year integer,
   Month Text
 );
@@ -88,23 +93,34 @@ create table Article (
   ArticleDate date,
   PubModel text NOT NULL,
   primary key (PMID),
-  foreign key (J_Id) references Journal(J_Id)
+  foreign key (j_Id) references Journal(j_Id)
 );
 ```
 
 Create table Author
 ```{sql connection = "DBcon"}
 create table Author (
+  
   Author_Id integer PRIMARY KEY AUTOINCREMENT,
-  PMID integer PRIMARY KEY NOT NULL,
   LastName text NOT NULL,
   ForeName text NOT NULL,
   Initials text NOT NULL,
-  Affiliation text,
-  foreign key (PMID) references Article(PMID)
+  Affiliation text
+
+  
 );
 ```
-
+Create table Author_ref
+```{sql connection = "DBcon"}
+create table Author_ref (
+  
+  PMID integer,
+  Author_Id integer,
+  Primary Key(PMID,Author_id)
+  foreign key (PMID) references Article(PMID),
+  foreign key (Author_Id) references Author(Author_Id)
+);
+```
 
 
 Create table History
@@ -138,6 +154,7 @@ create table Abstract (
   foreign key (PMID) references Article(PMID)
 );
 ```
+
 
 Closing DB connection
 ```{r}
