@@ -1,6 +1,8 @@
 ---
 title: "R Notebook"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 ---
@@ -12,6 +14,7 @@ output:
 
 ```{r}
 library(RSQLite)
+library(ggplot2)
 ```
 
 ```{r}
@@ -109,9 +112,17 @@ ON Article.j_id = Journal.j_id
 ```
 
 ```{sql connection = "DBcon"}
+SELECT * FROM articleFact
+```
+
+```{sql connection = "DBcon"}
 INSERT INTO dimJournal(ISSN, Title, ISOabbreviation, CiteMedium)
 SELECT DISTINCT ISSN, Title, ISOabbreviation, CiteMedium
 FROM Journal
+```
+
+```{sql connection = "DBcon"}
+SELECT * FROM dimJournal
 ```
 
 ```{sql connection = "DBcon"}
@@ -124,9 +135,17 @@ ON Article.j_id = Journal.j_id
 ```
 
 ```{sql connection = "DBcon"}
+SELECT * FROM dimTime
+```
+
+```{sql connection = "DBcon"}
 INSERT INTO dimArticle(PMID, ArticleTitle, ArticleDate, Language)
 SELECT PMID, ArticleTitle, ArticleDate, Language
 FROM Article
+```
+
+```{sql connection = "DBcon"}
+SELECT * FROM dimArticle
 ```
 
 ```{sql connection = "DBcon"}
@@ -135,6 +154,9 @@ SELECT Author_id, LastName, ForeName, Initial, Affiliation
 FROM Author
 ```
 
+```{sql connection = "DBcon"}
+SELECT * FROM dimAuthor
+```
 
 P2Q2
 ```{sql connection = "DBcon"}
@@ -147,7 +169,6 @@ CREATE TABLE articleSummary (
   Author_id INTEGER,
   ISSN TEXT,
   Year_Quarter TEXT,
-  subtotal INTEGER,
   PRIMARY KEY (PMID, Author_id),
   FOREIGN KEY (PMID) REFERENCES dimArticle(PMID),
   FOREIGN KEY (Author_id) REFERENCES dimAuthor(Author_id)
@@ -180,11 +201,37 @@ CASE Month
 END;
 ```
 
+```{sql connection = "DBcon"}
+SELECT * FROM dimTime
+```
 
 ```{sql connection = "DBcon"}
-INSERT INTO articleSummary(PMID, Author_id, ISSN, Year_Quarter, subtotal)
-SELECT PMID, Author_id, ISSN, Quarter, COUNT(*)
+INSERT INTO articleSummary(PMID, Author_id, ISSN, Year_Quarter)
+SELECT PMID, Author_id, ISSN, Quarter
 FROM ArticleFact NATURAL JOIN dimTime
-GROUP BY Quarter, Author_id, ISSN
 ```
+
+```{sql connection = "DBcon"}
+SELECT * FROM articleSummary
+```
+
+```{sql connection = "DBcon"}
+SELECT COUNT(DISTINCT PMID) AS count, Year_Quarter
+FROM articleSummary
+WHERE Year_Quarter IS NOT NULL
+GROUP BY Year_Quarter
+```
+
+```{r}
+sql <- "SELECT COUNT(DISTINCT PMID) AS count, Year_Quarter FROM articleSummary WHERE Year_Quarter IS NOT NULL GROUP BY Year_Quarter"
+df5 <-dbGetQuery(DBcon,sql)
+ ggplot(data = df5, aes(x = Year_Quarter, y = count)) + 
+  geom_line(aes(group=1)) +
+  xlab('Quarter') +
+  ylab('count')+labs(title = 'Number of journal publications by year-quarter')
+```
+
+
+
+
 
