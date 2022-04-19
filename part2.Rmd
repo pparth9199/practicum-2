@@ -1,0 +1,190 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r}
+library(RSQLite)
+```
+
+```{r}
+fn <- "pubmed_sample.xml"
+dbfn <- "pubmed.db"
+```
+
+```{r, include=FALSE}
+DBcon <- dbConnect(RSQLite::SQLite(), dbfn)
+dbExecute(DBcon, "PRAGMA foreign_keys = OFF")
+```
+
+Drop tables
+
+```{sql connection = "DBcon"}
+drop table if exists articleFact;
+```
+
+```{sql connection = "DBcon"}
+drop table if exists dimTime;
+```
+
+```{sql connection = "DBcon"}
+drop table if exists dimJournal;
+```
+
+```{sql connection = "DBcon"}
+drop table if exists dimArticle;
+```
+
+```{sql connection = "DBcon"}
+drop table if exists dimAuthor;
+```
+
+Create tables
+
+```{sql connection = "DBcon"}
+CREATE TABLE articleFact (
+  PMID INTEGER,
+  Author_id INTEGER,
+  ISSN TEXT,
+  tid INTEGER,
+  PRIMARY KEY (PMID, Author_id),
+  FOREIGN KEY (PMID) REFERENCES dimArticle(PMID),
+  FOREIGN KEY (ISSN) REFERENCES dimJournal(ISSN),
+  FOREIGN KEY (tid) REFERENCES dimTime(tid)
+);
+```
+
+```{sql connection = "DBcon"}
+CREATE TABLE dimTime (
+  tid TEXT PRIMARY KEY,
+  Year INTEGER,
+  Month TEXT
+);
+```
+
+```{sql connection = "DBcon"}
+CREATE TABLE dimJournal (
+  ISSN TEXT PRIMARY KEY,
+  Title TEXT,
+  ISOabbreviation TEXT,
+  CiteMedium TEXT
+);
+```
+
+```{sql connection = "DBcon"}
+CREATE TABLE dimArticle (
+  PMID INTEGER PRIMARY KEY,
+  ArticleTitle TEXT,
+  ArticleDate DATE,
+  Language TEXT
+);
+```
+
+```{sql connection = "DBcon"}
+CREATE TABLE dimAuthor (
+  Author_id INTEGER PRIMARY KEY,
+  LastName TEXT,
+  ForeName TEXT,
+  Initial TEXT,
+  Affiliation TEXT
+);
+```
+
+# Insert Data
+
+```{sql connection = "DBcon"}
+INSERT INTO articleFact(PMID, Author_id, ISSN, tid)
+SELECT Article.PMID, Author_ref.Author_id, Journal.ISSN, CAST(Journal.Year AS TEXT) || Journal.Month
+FROM Author_ref LEFT JOIN Article
+ON Article.PMID == Author_ref.PMID
+LEFT JOIN Journal
+ON Article.j_id = Journal.j_id
+```
+
+```{sql connection = "DBcon"}
+INSERT INTO dimJournal(ISSN, Title, ISOabbreviation, CiteMedium)
+SELECT DISTINCT ISSN, Title, ISOabbreviation, CiteMedium
+FROM Journal
+```
+
+```{sql connection = "DBcon"}
+INSERT INTO dimTime(tid, Year, Month)
+SELECT DISTINCT articleFact.tid, Journal.Year, Journal.Month
+FROM articleFact LEFT JOIN Article
+ON articleFact.PMID = Article.PMID
+LEFT JOIN Journal
+ON Article.j_id = Journal.j_id
+```
+
+```{sql connection = "DBcon"}
+INSERT INTO dimArticle(PMID, ArticleTitle, ArticleDate, Language)
+SELECT PMID, ArticleTitle, ArticleDate, Language
+FROM Article
+```
+
+```{sql connection = "DBcon"}
+INSERT INTO dimAuthor(Author_id, LastName, ForeName, Initial, Affiliation)
+SELECT Author_id, LastName, ForeName, Initial, Affiliation
+FROM Author
+```
+
+
+P2Q2
+```{sql connection = "DBcon"}
+drop table if exists articleSummary;
+```
+
+```{sql connection = "DBcon"}
+CREATE TABLE articleSummary (
+  PMID INTEGER,
+  Author_id INTEGER,
+  ISSN TEXT,
+  Year_Quarter TEXT,
+  subtotal INTEGER,
+  PRIMARY KEY (PMID, Author_id),
+  FOREIGN KEY (PMID) REFERENCES dimArticle(PMID),
+  FOREIGN KEY (Author_id) REFERENCES dimAuthor(Author_id)
+  FOREIGN KEY (ISSN) REFERENCES dimJournal(ISSN)
+);
+```
+
+
+```{sql connection = "DBcon"}
+ALTER TABLE dimTime
+ADD Quarter TEXT;
+```
+
+```{sql connection = "DBcon"}
+UPDATE dimTime
+SET Quarter = 
+CASE Month
+  WHEN 'Jan' THEN CAST(Year AS TEXT) || 'Q1'
+  WHEN 'Feb' THEN CAST(Year AS TEXT) || 'Q1'
+  WHEN 'Mar' THEN CAST(Year AS TEXT) || 'Q1'
+  WHEN 'Apr' THEN CAST(Year AS TEXT) || 'Q2'
+  WHEN 'May' THEN CAST(Year AS TEXT) || 'Q2'
+  WHEN 'Jun' THEN CAST(Year AS TEXT) || 'Q2'
+  WHEN 'Jul' THEN CAST(Year AS TEXT) || 'Q3'
+  WHEN 'Aug' THEN CAST(Year AS TEXT) || 'Q3'
+  WHEN 'Sep' THEN CAST(Year AS TEXT) || 'Q3'
+  WHEN 'Oct' THEN CAST(Year AS TEXT) || 'Q4'
+  WHEN 'Nov' THEN CAST(Year AS TEXT) || 'Q4'
+  WHEN 'Dec' THEN CAST(Year AS TEXT) || 'Q4'
+END;
+```
+
+
+```{sql connection = "DBcon"}
+INSERT INTO articleSummary(PMID, Author_id, ISSN, Year_Quarter, subtotal)
+SELECT PMID, Author_id, ISSN, Quarter, COUNT(*)
+FROM ArticleFact NATURAL JOIN dimTime
+GROUP BY Quarter, Author_id, ISSN
+```
+
