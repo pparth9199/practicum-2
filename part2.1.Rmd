@@ -100,7 +100,7 @@ CREATE TABLE dimAuthor (
 # Insert Data
 
 ```{sql connection = "DBcon"}
-INSERT INTO articleFact(PMID, Author_id, ISSN, tid)
+INSERT INTO articleFact(PMID, Author_id, ISSN)
 SELECT Article.PMID, Author_ref.Author_id, Journal.ISSN
 FROM Author_ref LEFT JOIN Article
 ON Article.PMID == Author_ref.PMID
@@ -133,6 +133,29 @@ FROM Article
 INSERT INTO dimAuthor(Author_id, LastName, ForeName, Initial, Affiliation)
 SELECT Author_id, LastName, FoerName, Initial, Affiliation
 FROM Author
+```
+
+
+#Summary Table
+
+```{sql connection = "DBcon"}
+drop table if exists articleSummary;
+```
+
+```{sql connection = "DBcon"}
+CREATE TABLE articleSummary (
+  PMID INTEGER,
+  Author_id INTEGER,
+  ISSN TEXT,
+  Year INTEGER,
+  Quarter INTEGER,
+  Month INTEGER,
+  subtotal INTEGER,
+  PRIMARY KEY (PMID, Author_id),
+  FOREIGN KEY (PMID) REFERENCES dimArticle(PMID),
+  FOREIGN KEY (ISSN) REFERENCES dimJournal(ISSN),
+  FOREIGN KEY (tid) REFERENCES dimTime(tid)
+);
 ```
 
 
