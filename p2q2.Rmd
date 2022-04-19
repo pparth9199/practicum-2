@@ -1,0 +1,46 @@
+```{sql connection = "DBcon"}
+CREATE TABLE articleSummary (
+  PMID INTEGER,
+  Author_id INTEGER,
+  ISSN TEXT,
+  Year_Quarter TEXT,
+  PRIMARY KEY (PMID, Author_id),
+  FOREIGN KEY (PMID) REFERENCES ON dimArticle(PMID),
+  FOREIGN KEY (Author_id) REFERENCES ON dimAuthor(Author_id)
+  FOREIGN KEY (ISSN) REFERENCES ON dimJournal(ISSN)
+);
+```
+
+
+```{sql connection = "DBcon"}
+ALTER TABLE dimTime
+ADD Quarter TEXT;
+```
+
+```{sql connection = "DBcon"}
+INSERT INTO dimTime(Quarter)
+SELECT CASE Month
+  WHEN 'Jan' THEN CAST(Year AS TEXT) || 'Q1'
+  WHEN 'Feb' THEN CAST(Year AS TEXT) || 'Q1'
+  WHEN 'Mar' THEN CAST(Year AS TEXT) || 'Q1'
+  WHEN 'Apr' THEN CAST(Year AS TEXT) || 'Q2'
+  WHEN 'May' THEN CAST(Year AS TEXT) || 'Q2'
+  WHEN 'Jun' THEN CAST(Year AS TEXT) || 'Q2'
+  WHEN 'Jul' THEN CAST(Year AS TEXT) || 'Q3'
+  WHEN 'Aug' THEN CAST(Year AS TEXT) || 'Q3'
+  WHEN 'Sep' THEN CAST(Year AS TEXT) || 'Q3'
+  WHEN 'Oct' THEN CAST(Year AS TEXT) || 'Q4'
+  WHEN 'Nov' THEN CAST(Year AS TEXT) || 'Q4'
+  WHEN 'Dec' THEN CAST(Year AS TEXT) || 'Q4'
+END
+FROM dimTime;
+```
+
+
+```{sql connection = "DBcon"}
+INSERT INTO articleSummary(PMID, Author_id, ISSN, Year_Quarter, subtotal)
+SELECT PMID, Author_id, ISSN, Quarter, COUNT(*)
+FROM ArticleFact NATURAL JOIN dimTime
+GROUP BY Quarter, Author_id, ISSN
+```
+

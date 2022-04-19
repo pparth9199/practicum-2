@@ -21,7 +21,7 @@ dbfn <- "pubmed.db"
 
 ```{r, include=FALSE}
 DBcon <- dbConnect(RSQLite::SQLite(), dbfn)
-dbExecute(DBcon, "PRAGMA foreign_keys = ON")
+dbExecute(DBcon, "PRAGMA foreign_keys = OFF")
 ```
 
 Drop tables
@@ -53,7 +53,7 @@ CREATE TABLE articleFact (
   PMID INTEGER,
   Author_id INTEGER,
   ISSN TEXT,
-  tid INTEGER AUTO_INCREMENT,
+  tid INTEGER,
   PRIMARY KEY (PMID, Author_id),
   FOREIGN KEY (PMID) REFERENCES dimArticle(PMID),
   FOREIGN KEY (ISSN) REFERENCES dimJournal(ISSN),
@@ -63,7 +63,7 @@ CREATE TABLE articleFact (
 
 ```{sql connection = "DBcon"}
 CREATE TABLE dimTime (
-  tid INTEGER PRIMARY KEY,
+  tid TEXT PRIMARY KEY,
   Year INTEGER,
   Month TEXT
 );
@@ -74,7 +74,7 @@ CREATE TABLE dimJournal (
   ISSN TEXT PRIMARY KEY,
   Title TEXT,
   ISOabbreviation TEXT,
-  CitedMedium TEXT
+  CiteMedium TEXT
 );
 ```
 
@@ -100,8 +100,8 @@ CREATE TABLE dimAuthor (
 # Insert Data
 
 ```{sql connection = "DBcon"}
-INSERT INTO articleFact(PMID, Author_id, ISSN)
-SELECT Article.PMID, Author_ref.Author_id, Journal.ISSN
+INSERT INTO articleFact(PMID, Author_id, ISSN, tid)
+SELECT Article.PMID, Author_ref.Author_id, Journal.ISSN, CAST(Journal.Year AS TEXT) || Journal.Month
 FROM Author_ref LEFT JOIN Article
 ON Article.PMID == Author_ref.PMID
 LEFT JOIN Journal
@@ -109,14 +109,14 @@ ON Article.j_id = Journal.j_id
 ```
 
 ```{sql connection = "DBcon"}
-INSERT INTO dimJournal(ISSN, Title, ISOabbreviation, CitedMedium)
-SELECT ISSN, Title, ISOabbreviation, CitedMedium
+INSERT INTO dimJournal(ISSN, Title, ISOabbreviation, CiteMedium)
+SELECT DISTINCT ISSN, Title, ISOabbreviation, CiteMedium
 FROM Journal
 ```
 
 ```{sql connection = "DBcon"}
 INSERT INTO dimTime(tid, Year, Month)
-SELECT articleFact.tid, Journal.Year, Journal.Month
+SELECT DISTINCT articleFact.tid, Journal.Year, Journal.Month
 FROM articleFact LEFT JOIN Article
 ON articleFact.PMID = Article.PMID
 LEFT JOIN Journal
@@ -131,13 +131,12 @@ FROM Article
 
 ```{sql connection = "DBcon"}
 INSERT INTO dimAuthor(Author_id, LastName, ForeName, Initial, Affiliation)
-SELECT Author_id, LastName, FoerName, Initial, Affiliation
+SELECT Author_id, LastName, ForeName, Initial, Affiliation
 FROM Author
 ```
 
 
-#Summary Table
-
+P2Q2
 ```{sql connection = "DBcon"}
 drop table if exists articleSummary;
 ```
@@ -147,66 +146,45 @@ CREATE TABLE articleSummary (
   PMID INTEGER,
   Author_id INTEGER,
   ISSN TEXT,
-  Year INTEGER,
-  Quarter INTEGER,
-  Month INTEGER,
+  Year_Quarter TEXT,
   subtotal INTEGER,
   PRIMARY KEY (PMID, Author_id),
   FOREIGN KEY (PMID) REFERENCES dimArticle(PMID),
-  FOREIGN KEY (ISSN) REFERENCES dimJournal(ISSN),
-  FOREIGN KEY (tid) REFERENCES dimTime(tid)
+  FOREIGN KEY (Author_id) REFERENCES dimAuthor(Author_id)
+  FOREIGN KEY (ISSN) REFERENCES dimJournal(ISSN)
 );
 ```
 
 
-
-
-
-
-# Loading Libraries
-
-```{r warning=FALSE}
-library(XML)
-library(xslt)
+```{sql connection = "DBcon"}
+ALTER TABLE dimTime
+ADD Quarter TEXT;
 ```
 
-# Load XML data to database
-
-## Read XML file
-
-```{r}
-xmlPath <- "./pubmed_sample.xml"
-xmlDoc = read_xml(xmlPath)
+```{sql connection = "DBcon"}
+UPDATE dimTime
+SET Quarter = 
+CASE Month
+  WHEN 'Jan' THEN CAST(Year AS TEXT) || 'Q1'
+  WHEN 'Feb' THEN CAST(Year AS TEXT) || 'Q1'
+  WHEN 'Mar' THEN CAST(Year AS TEXT) || 'Q1'
+  WHEN 'Apr' THEN CAST(Year AS TEXT) || 'Q2'
+  WHEN 'May' THEN CAST(Year AS TEXT) || 'Q2'
+  WHEN 'Jun' THEN CAST(Year AS TEXT) || 'Q2'
+  WHEN 'Jul' THEN CAST(Year AS TEXT) || 'Q3'
+  WHEN 'Aug' THEN CAST(Year AS TEXT) || 'Q3'
+  WHEN 'Sep' THEN CAST(Year AS TEXT) || 'Q3'
+  WHEN 'Oct' THEN CAST(Year AS TEXT) || 'Q4'
+  WHEN 'Nov' THEN CAST(Year AS TEXT) || 'Q4'
+  WHEN 'Dec' THEN CAST(Year AS TEXT) || 'Q4'
+END;
 ```
 
-## Load dimJournal table
 
-```{r}
-xslPath = "./journal.xsl"
-xslDoc = read_xml(xslPath,package="xslt")
-journal_raw = xml_xslt(xmlDoc,xslDoc)
-journals = unique(xmlToDataFrame(XML::xmlParse(journal_raw)))
-dbWriteTable(DBcon,name = "dimJournal", value = journals, append = TRUE)
+```{sql connection = "DBcon"}
+INSERT INTO articleSummary(PMID, Author_id, ISSN, Year_Quarter, subtotal)
+SELECT PMID, Author_id, ISSN, Quarter, COUNT(*)
+FROM ArticleFact NATURAL JOIN dimTime
+GROUP BY Quarter, Author_id, ISSN
 ```
 
-## Load Author table
-
-```{r}
-xslPath = "./author.xsl"
-xslDoc = read_xml(xslPath,package="xslt")
-author_raw = xml_xslt(xmlDoc,xslDoc)
-authors = unique(xmlToDataFrame(XML::xmlParse(author_raw)))
-authors = cbind(Author_id=rownames(authors),authors)
-dbWriteTable(DBcon,name = "dimAuthor", value = authors, append = TRUE)
-```
-
-## Load articleFact
-
-```{r}
-xslPath = "./articleFact.xsl"
-xslDoc = read_xml(xslPath,package="xslt")
-author_raw = xml_xslt(xmlDoc,xslDoc)
-authors = unique(xmlToDataFrame(XML::xmlParse(author_raw)))
-authors = cbind(Author_id=rownames(authors),authors)
-dbWriteTable(DBcon,name = "articleFact", value = authors, append = TRUE)
-```
