@@ -287,14 +287,19 @@ parseJournal <- function(aJournalNode)
   ISSN <- as.character(xmlValue(aJournalNode[[1]]))
   Volume <- as.numeric(xmlValue(childNodeOne[[1]]))
   Issue <- as.numeric(xmlValue(childNodeOne[[2]]))
-  year <- xpathSApply(grandChildNode, "./Year", xmlValue)
-  if (length(year) == 0)
-      year <- ""
-  Year <- as.numeric(year)
-  month <- xpathSApply(grandChildNode, "./Month", xmlValue)
-   if (length(month) == 0)
-      month <- ""
-  Month <- month
+  
+Year <- xmlValue(grandChildNode[[1]])
+
+
+
+whole <- strsplit(Year, " ")
+if(length(whole[[1]]) == 1){
+Month <- xmlValue(grandChildNode[[2]])
+}else{
+Year <- whole[[1]][1]
+Month <- whole[[1]][2]
+}
+Year <- as.numeric(Year)
   a <- xmlAttrs(childNodeOne)
   CiteMedium<-a[1]
   Title <- xmlValue(aJournalNode[[3]])
