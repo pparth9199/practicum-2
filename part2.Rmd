@@ -185,19 +185,19 @@ ADD Quarter TEXT;
 ```{sql connection = "DBcon"}
 UPDATE dimTime
 SET Quarter = 
-CASE Month
-  WHEN 'Jan' THEN CAST(Year AS TEXT) || 'Q1'
-  WHEN 'Feb' THEN CAST(Year AS TEXT) || 'Q1'
-  WHEN 'Mar' THEN CAST(Year AS TEXT) || 'Q1'
-  WHEN 'Apr' THEN CAST(Year AS TEXT) || 'Q2'
-  WHEN 'May' THEN CAST(Year AS TEXT) || 'Q2'
-  WHEN 'Jun' THEN CAST(Year AS TEXT) || 'Q2'
-  WHEN 'Jul' THEN CAST(Year AS TEXT) || 'Q3'
-  WHEN 'Aug' THEN CAST(Year AS TEXT) || 'Q3'
-  WHEN 'Sep' THEN CAST(Year AS TEXT) || 'Q3'
-  WHEN 'Oct' THEN CAST(Year AS TEXT) || 'Q4'
-  WHEN 'Nov' THEN CAST(Year AS TEXT) || 'Q4'
-  WHEN 'Dec' THEN CAST(Year AS TEXT) || 'Q4'
+CASE
+  WHEN Month LIKE 'Jan%' THEN CAST(Year AS TEXT) || 'Q1'
+  WHEN Month LIKE 'Feb%' THEN CAST(Year AS TEXT) || 'Q1'
+  WHEN Month LIKE 'Mar%' THEN CAST(Year AS TEXT) || 'Q1'
+  WHEN Month LIKE 'Apr%' THEN CAST(Year AS TEXT) || 'Q2'
+  WHEN Month LIKE 'May%' THEN CAST(Year AS TEXT) || 'Q2'
+  WHEN Month LIKE 'Jun%' THEN CAST(Year AS TEXT) || 'Q2'
+  WHEN Month LIKE 'Jul%' THEN CAST(Year AS TEXT) || 'Q3'
+  WHEN Month LIKE 'Aug%' THEN CAST(Year AS TEXT) || 'Q3'
+  WHEN Month LIKE 'Sep%' THEN CAST(Year AS TEXT) || 'Q3'
+  WHEN Month LIKE 'Oct%' THEN CAST(Year AS TEXT) || 'Q4'
+  WHEN Month LIKE 'Nov%' THEN CAST(Year AS TEXT) || 'Q4'
+  WHEN Month LIKE 'Dec%' THEN CAST(Year AS TEXT) || 'Q4'
 END;
 ```
 
